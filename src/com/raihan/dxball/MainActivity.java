@@ -12,6 +12,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -30,7 +34,7 @@ public class MainActivity extends Activity {
         setContentView(mainView);
     }
     
-	 class MainView extends SurfaceView implements Runnable {
+	 class MainView extends SurfaceView implements Runnable, SensorEventListener {
 	     Thread gameThread = null;
 	     SurfaceHolder ourHolder;
 	
@@ -48,12 +52,17 @@ public class MainActivity extends Activity {
 	     Paddle paddle;
 	     Ball ball;
 	     Brick[] bricks = new Brick[200];
-	     int numBricks = 0;
+	     int brickTotal, brickDone;
+	     
+	     Sensor sensor;
+	     SensorManager sensorManager;
 	     
 	     SoundPool soundPool;
 	     int beep1ID = -1, beep2ID = -1, beep3ID = -1, loseLifeID = -1, explodeID = -1;
-	      
-	     int score = 0, lives = 3;
+	     
+	     Settings settings;
+	     int score, lives, highScore, lavel;
+	     int[][][] layout;
 	
 	     public MainView(Context context) {
 	         super(context);
@@ -68,6 +77,17 @@ public class MainActivity extends Activity {
 	         paddle = new Paddle(screenX, screenY);
 	         ball = new Ball();
 	         
+	         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+	         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+	         
+	         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+	         
+	         settings = new Settings();
+	         highScore = settings.getHighScore();
+	         lavel = 0;
+	         score = 0;
+	         layout = settings.getLayout();
+	         
 	         loadMusic(context);
 	         
 	         createBricksAndRestart();
@@ -75,17 +95,22 @@ public class MainActivity extends Activity {
 	     
 	     public void createBricksAndRestart(){
 	         ball.reset(screenX, screenY);
-	         
-	         int brickWidth = screenY / 10;
-	         int brickHeight = screenX / 8;
-	         numBricks = 0;
+	         int brickWidth = screenX / 8;
+	         int brickHeight = screenY / 10;
+	         brickTotal = 0;
+	         brickDone = 0;
 	         for(int column = 0; column < 8; column ++ ){
-	              for(int row = 0; row < 3; row ++ ){
-	                   bricks[numBricks] = new Brick(row, column, brickWidth, brickHeight);
-	                   numBricks ++;
+	              for(int row = 0; row < 5; row ++ ){
+	                   bricks[brickTotal] = new Brick(
+	                		   row, 
+	                		   column, 
+	                		   brickWidth, 
+	                		   brickHeight, 
+	                		   layout[lavel][row][column]);
+	                   if (layout[lavel][row][column] == 1)
+	                       brickTotal ++;
 	              }
 	         }
-	         score = 0;
 	         lives = 3;
 	     }
 	
@@ -105,16 +130,17 @@ public class MainActivity extends Activity {
 	     }
 
 	     public void update() {
-	    	 paddle.update(fps);
+	    	 paddle.update(fps, screenX);
 	    	 ball.update(fps);
 	    	 
 	    	 // Check for ball colliding with a brick
-	    	 for(int i = 0; i < numBricks; i++){
-	    		 if (bricks[i].getVisibility()){
+	    	 for(int i = 0; i < brickTotal; i++){
+	    		 if (bricks[i].getVisibility() == 1){
 	    			 if(RectF.intersects(bricks[i].getRect(), ball.getRect())) {
 	    				 bricks[i].setInvisible();
 	    				 ball.reverseYVelocity();
 	    				 score += 10;
+	    				 brickDone++;
 	    				 soundPool.play(explodeID, 1, 1, 0, 0, 1);
 	    			 }
 	    		 }
@@ -135,8 +161,9 @@ public class MainActivity extends Activity {
 	    	     lives --;
 	    	     soundPool.play(loseLifeID, 1, 1, 0, 0, 1);
 	    	     if(lives == 0){
-	    	          paused = true;
-	    	          createBricksAndRestart();
+	    	    	 lavel = 0;
+	    	    	 paused = true;
+	    	    	 createBricksAndRestart();
 	    	     }
 		 	 }
 	    	 
@@ -162,44 +189,51 @@ public class MainActivity extends Activity {
 	    	 }
 	    	 
 	    	 // Pause if cleared screen
-	    	 if(score == numBricks * 10){
-	    	      paused = true;
-	    	      createBricksAndRestart();
+	    	 if(brickDone == brickTotal){
+	    		 lavel++; 
+	    		 if (lavel == 3)
+		        	 lavel = 0;
+	    		 paused = true;
+	    		 createBricksAndRestart();
 	    	 }
 	     }
 	
 	     public void draw() {
 	         if (ourHolder.getSurface().isValid()) {
 	             canvas = ourHolder.lockCanvas();
-	             canvas.drawColor(Color.argb(255,  26, 128, 182));
+	             canvas.drawColor(settings.getBackColor(3 - lives));
 	             
 	             paint.setColor(Color.argb(255,  255, 255, 255)); // for ball and paddle
 	             canvas.drawRect(paddle.getRect(), paint);	
 	             canvas.drawRect(ball.getRect(), paint);
 	             
 	             paint.setColor(Color.argb(255,  249, 129, 0)); // for bricks
-	             for(int i = 0; i < numBricks; i++){
-	                  if(bricks[i].getVisibility()) {
+	             for(int i = 0; i < brickTotal; i++){
+	                  if(bricks[i].getVisibility() == 1) {
 	                       canvas.drawRect(bricks[i].getRect(), paint);
 	                  }
 	             }
 
 	             paint.setColor(Color.argb(255, 0, 0, 0));
-	             paint.setTextSize(20);
+	             paint.setTextSize(35);
 	             canvas.drawText(
 	            		 "Score: " + score + 
 	            		 "  Lives: " + lives +
 	            		 "  High Score: " + score +
-	            		 "  Lavel: " + lives , 10, 50, paint);
+	            		 "  Lavel: " + (lavel + 1) , 10, 50, paint); //highScore
 	              
-	             if(score == numBricks * 10){
+	             if(brickDone == brickTotal && lavel == 2){
 	                  paint.setTextSize(90);
 	                  canvas.drawText("YOU HAVE WON!", 10, screenY/2, paint);
+	                  score = 0;
+	                  lavel = 0;
 	             }
 	              
 	             if(lives <= 0){
 	                  paint.setTextSize(90);
 	                  canvas.drawText("YOU HAVE LOST!", 10, screenY/2, paint);
+	                  score = 0;
+	                  lavel = 0;
 	             }
 	             
 	             ourHolder.unlockCanvasAndPost(canvas);
@@ -207,6 +241,10 @@ public class MainActivity extends Activity {
 	     }
 	
 	     public void pause() {
+	    	 if (sensorManager != null) {
+	    		 sensorManager.unregisterListener(this);
+	    		 sensorManager = null;
+             }
 	         playing = false;
 	         try {
 	             gameThread.join();
@@ -258,7 +296,26 @@ public class MainActivity extends Activity {
 	         }catch(IOException e){
 	        	 Log.e("error", "failed to load sound files");
         	 }			
-		}
+		 }
+
+		 
+	     public void onAccuracyChanged(Sensor arg0, int arg1) {
+			// TODO Auto-generated method stub
+			
+	  	 }
+		
+		 public void onSensorChanged(SensorEvent arg0) {
+			 float x = arg0.values[SensorManager.DATA_X];
+
+			 if(x < -1){
+				 paddle.setMovementState(paddle.RIGHT);
+			 }
+			 else if(x > 1){
+				 paddle.setMovementState(paddle.LEFT);
+			 }
+			 else
+				 paddle.setMovementState(paddle.STOPPED);
+		 }
 	 }
 
 	 @Override

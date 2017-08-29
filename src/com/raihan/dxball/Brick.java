@@ -4,10 +4,10 @@ import android.graphics.RectF;
 
 public class Brick {
     private RectF rect;
-    private boolean isVisible;
+    private int isVisible;
  
-    public Brick(int row, int column, int width, int height){
-        isVisible = true;
+    public Brick(int row, int column, int width, int height, int visible){
+        isVisible = visible;
         int padding = 1;
         rect = new RectF(
         		column * width + padding,
@@ -21,10 +21,10 @@ public class Brick {
     }
  
     public void setInvisible(){
-        isVisible = false;
+        isVisible = 0;
     }
  
-    public boolean getVisibility(){
+    public int getVisibility(){
         return isVisible;
     }
 }

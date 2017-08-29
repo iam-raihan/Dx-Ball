@@ -17,12 +17,12 @@ public class Paddle {
     private int paddleMoving = STOPPED;
  
     public Paddle(int screenX, int screenY){
-        length = 130;
+        length = 230;
         height = 20;
         x = screenX / 2;
         y = screenY - 20;
         rect = new RectF(x, y, x + length, y + height);
-        paddleSpeed = 350;
+        paddleSpeed = 450;
     }
     
     public RectF getRect(){
@@ -33,11 +33,11 @@ public class Paddle {
         paddleMoving = state;
     }
  
-    public void update(long fps){
-        if(paddleMoving == LEFT){
+    public void update(long fps, int screenX){
+        if(paddleMoving == LEFT && rect.left > 0){
             x = x - paddleSpeed / fps;
         }
-        if(paddleMoving == RIGHT){
+        if(paddleMoving == RIGHT && rect.right < screenX){
             x = x + paddleSpeed / fps;
         }
         rect.left = x;
