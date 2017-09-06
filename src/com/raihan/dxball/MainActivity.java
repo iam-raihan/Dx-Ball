@@ -61,8 +61,9 @@ public class MainActivity extends Activity {
 	     int beep1ID = -1, beep2ID = -1, beep3ID = -1, loseLifeID = -1, explodeID = -1;
 	     
 	     Settings settings;
-	     int score, lives, highScore, lavel;
+	     int score, lives, lavel, highScore;
 	     int[][][] layout;
+	     HighScore highScoreObj;
 	
 	     public MainView(Context context) {
 	         super(context);
@@ -77,40 +78,41 @@ public class MainActivity extends Activity {
 	         paddle = new Paddle(screenX, screenY);
 	         ball = new Ball();
 	         
-	         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-	         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-	         
-	         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
-	         
 	         settings = new Settings();
-	         highScore = settings.getHighScore();
-	         lavel = 0;
+	         
 	         score = 0;
+	         lavel = 0;
+	         
+	         highScoreObj = new HighScore(context);
+	         highScore = highScoreObj.getHighScore();
+	         
 	         layout = settings.getLayout();
 	         
 	         loadMusic(context);
 	         
-	         createBricksAndRestart();
+    		 createBricksAndRestart();
 	     }
 	     
 	     public void createBricksAndRestart(){
 	         ball.reset(screenX, screenY);
+	         paddle.reset(screenX);
 	         int brickWidth = screenX / 8;
 	         int brickHeight = screenY / 10;
 	         brickTotal = 0;
 	         brickDone = 0;
 	         for(int column = 0; column < 8; column ++ ){
 	              for(int row = 0; row < 5; row ++ ){
-	                   bricks[brickTotal] = new Brick(
-	                		   row, 
-	                		   column, 
-	                		   brickWidth, 
-	                		   brickHeight, 
-	                		   layout[lavel][row][column]);
-	                   if (layout[lavel][row][column] == 1)
-	                       brickTotal ++;
+	                   if (layout[lavel][row][column] == 1) {
+	                	   bricks[brickTotal] = new Brick(
+		                		   row, 
+		                		   column, 
+		                		   brickWidth, 
+		                		   brickHeight);
+	                	   brickTotal ++;
+	                   }
 	              }
 	         }
+	         
 	         lives = 3;
 	     }
 	
@@ -152,6 +154,7 @@ public class MainActivity extends Activity {
 	    	     ball.reverseYVelocity();
 	    	     ball.clearObstacleY(paddle.getRect().top - 2);
 	    	     soundPool.play(beep1ID, 1, 1, 0, 0, 1);
+	    	     score -= 5;
 	    	 }
 	    	 
 	    	 // Check for ball colliding with bottom of screen
@@ -163,6 +166,10 @@ public class MainActivity extends Activity {
 	    	     if(lives == 0){
 	    	    	 lavel = 0;
 	    	    	 paused = true;
+	    	    	 if (score > highScore) {
+			    		 highScoreObj.setHighScore(score);
+			    		 highScore = highScoreObj.getHighScore();
+		    		 }
 	    	    	 createBricksAndRestart();
 	    	     }
 		 	 }
@@ -215,12 +222,12 @@ public class MainActivity extends Activity {
 	             }
 
 	             paint.setColor(Color.argb(255, 0, 0, 0));
-	             paint.setTextSize(35);
+	             paint.setTextSize(30);
 	             canvas.drawText(
 	            		 "Score: " + score + 
 	            		 "  Lives: " + lives +
-	            		 "  High Score: " + score +
-	            		 "  Lavel: " + (lavel + 1) , 10, 50, paint); //highScore
+	            		 "  Lavel: " + (lavel + 1) +
+	            		 "  High Score: " + highScore , 10, 50, paint);
 	              
 	             if(brickDone == brickTotal && lavel == 2){
 	                  paint.setTextSize(90);
@@ -241,38 +248,36 @@ public class MainActivity extends Activity {
 	     }
 	
 	     public void pause() {
-	    	 if (sensorManager != null) {
-	    		 sensorManager.unregisterListener(this);
-	    		 sensorManager = null;
-             }
 	         playing = false;
 	         try {
 	             gameThread.join();
 	         } catch (InterruptedException e) {
 	             Log.e("Error:", "joining thread");
 	         }
+	         
+	    	 if (sensorManager != null) {
+	    		 sensorManager.unregisterListener(this);
+	    		 sensorManager = null;
+             }
 	     }
 	     
 	     public void resume() {
 	         playing = true;
 	         gameThread = new Thread(this);
 	         gameThread.start();
+	         
+	         if (sensorManager == null){
+		         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+	         }
+	         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
 	     }
 
 	     @Override
 	     public boolean onTouchEvent(MotionEvent motionEvent) {	
 	         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
 	             case MotionEvent.ACTION_DOWN:
-	                 paused = false;
-	                 if(motionEvent.getX() > screenX / 2){
-	                     paddle.setMovementState(paddle.RIGHT);
-	                 }
-	                 else{
-	                     paddle.setMovementState(paddle.LEFT);
-	                 }
-	                 break;
-	             case MotionEvent.ACTION_UP:
-	                 paddle.setMovementState(paddle.STOPPED);
+	                 paused = !paused;
 	                 break;
 	         }
 	         return true;
@@ -298,24 +303,19 @@ public class MainActivity extends Activity {
         	 }			
 		 }
 
-		 
-	     public void onAccuracyChanged(Sensor arg0, int arg1) {
-			// TODO Auto-generated method stub
-			
-	  	 }
-		
 		 public void onSensorChanged(SensorEvent arg0) {
 			 float x = arg0.values[SensorManager.DATA_X];
 
-			 if(x < -1){
+			 if(x < -1)
 				 paddle.setMovementState(paddle.RIGHT);
-			 }
-			 else if(x > 1){
+			 else if(x > 1)
 				 paddle.setMovementState(paddle.LEFT);
-			 }
 			 else
 				 paddle.setMovementState(paddle.STOPPED);
 		 }
+
+		public void onAccuracyChanged(Sensor arg0, int arg1) {
+		}
 	 }
 
 	 @Override

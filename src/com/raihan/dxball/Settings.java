@@ -3,36 +3,38 @@ package com.raihan.dxball;
 import android.graphics.Color;
 
 public class Settings {
-
-	public int[][][] getLayout(){
-		return new int[][][] {
-				{
-					{ 0, 0, 1, 1, 1, 1, 0, 0},
-					{ 0, 1, 0, 0, 0, 0, 1, 0},
-					{ 1, 0, 0, 1, 1, 0, 0, 1},
-					{ 0, 1, 0, 0, 0, 0, 1, 0},
-					{ 0, 0, 1, 1, 1, 1, 0, 0}
-				},
-				{
-					{ 1, 1, 1, 0, 0, 1, 1, 1},
-					{ 1, 1, 1, 0, 0, 1, 1, 1},
-					{ 1, 1, 1, 0, 0, 1, 1, 1},
-					{ 1, 1, 1, 0, 0, 1, 1, 1},
-					{ 1, 1, 1, 0, 0, 1, 1, 1}
-				},
-				{ 
-					{ 1, 0, 0, 0, 0, 0, 0, 1},
-					{ 0, 0, 0, 0, 0, 0, 0, 0},
-					{ 0, 0, 0, 1, 1, 0, 0, 0},
-					{ 0, 0, 0, 0, 0, 0, 0, 0},
-					{ 1, 1, 0, 0, 0, 0, 0, 1} 
-				}
-			};
+	private int lavelCount;
+	
+	private int[][][] layout = {
+			{
+				{ 0, 0, 1, 1, 1, 1, 0, 0},
+				{ 0, 1, 0, 0, 0, 0, 1, 0},
+				{ 1, 0, 0, 1, 1, 0, 0, 1},
+				{ 0, 1, 0, 0, 0, 0, 1, 0},
+				{ 0, 0, 1, 1, 1, 1, 0, 0}
+			},
+			{
+				{ 1, 1, 1, 0, 0, 1, 1, 1},
+				{ 1, 1, 1, 0, 0, 1, 1, 1},
+				{ 1, 1, 1, 0, 0, 1, 1, 1},
+				{ 1, 1, 1, 0, 0, 1, 1, 1},
+				{ 1, 1, 1, 0, 0, 1, 1, 1}
+			},
+			{ 
+				{ 1, 0, 0, 0, 0, 0, 0, 1},
+				{ 0, 0, 0, 0, 0, 0, 0, 0},
+				{ 0, 0, 0, 1, 1, 0, 0, 0},
+				{ 0, 0, 0, 0, 0, 0, 0, 0},
+				{ 1, 0, 0, 0, 0, 0, 0, 1} 
+			}
+		};
+	
+	public Settings(){
+		lavelCount = layout.length;;
 	}
 	
-	public int getHighScore() {
-		// TODO Auto-generated method stub
-		return 100;
+	public int[][][] getLayout(){
+		return layout;
 	}
 	
 	public int getBackColor(int life){
@@ -44,7 +46,7 @@ public class Settings {
 		}
 		return Color.argb(255,  231, 76, 60); //red
 	}
-	
+
 	
 
 }

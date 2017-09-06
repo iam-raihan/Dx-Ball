@@ -19,7 +19,7 @@ public class Paddle {
     public Paddle(int screenX, int screenY){
         length = 230;
         height = 20;
-        x = screenX / 2;
+        x = screenX / 2 - length / 2;
         y = screenY - 20;
         rect = new RectF(x, y, x + length, y + height);
         paddleSpeed = 450;
@@ -40,6 +40,12 @@ public class Paddle {
         if(paddleMoving == RIGHT && rect.right < screenX){
             x = x + paddleSpeed / fps;
         }
+        rect.left = x;
+        rect.right = x + length;
+    }
+    
+    public void reset(int screenX){
+    	x = screenX / 2 - length / 2;
         rect.left = x;
         rect.right = x + length;
     }

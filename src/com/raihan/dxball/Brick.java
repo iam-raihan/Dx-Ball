@@ -4,11 +4,12 @@ import android.graphics.RectF;
 
 public class Brick {
     private RectF rect;
+    private int padding;
     private int isVisible;
  
-    public Brick(int row, int column, int width, int height, int visible){
-        isVisible = visible;
-        int padding = 1;
+    public Brick(int row, int column, int width, int height){
+        isVisible = 1;
+        padding = 1;
         rect = new RectF(
         		column * width + padding,
                 row * height + padding,
