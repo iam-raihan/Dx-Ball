@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -51,11 +52,12 @@ public class MainActivity extends Activity {
 	     
 	     Paddle paddle;
 	     Ball ball;
-	     Brick[] bricks;
+	     Box[] boxArray;
 	     int brickTotal, brickDone;
 	     
 	     Sensor sensor;
 	     SensorManager sensorManager;
+	     Vibrator vibrator;
 	     
 	     SoundPool soundPool;
 	     int beep1ID, beep2ID, beep3ID, loseLifeID, explodeID;
@@ -74,9 +76,10 @@ public class MainActivity extends Activity {
 	         
 	         paddle = new Paddle(screenX, screenY);
 	         ball = new Ball();
-	         bricks = new Brick[50];
 	         
 	         __game_Session = new GameSession(context);
+	         
+	         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 	         
 	         loadMusic(context);
 	         
@@ -86,23 +89,10 @@ public class MainActivity extends Activity {
 	     public void createBricksLayout(){
 	         ball.reset(screenX, screenY);
 	         paddle.reset(screenX);
-	         int brickWidth = screenX / 8;
-	         int brickHeight = screenY / 10;
-	         brickTotal = 0;
+	         
+	         boxArray = __game_Session.getBricks(screenX);
+	         brickTotal = boxArray.length;
 	         brickDone = 0;
-	         int[][] curLayout = __game_Session.getCurLayout();
-	         for(int column = 0; column < 8; column ++ ){
-	              for(int row = 0; row < 5; row ++ ){
-	                   if (curLayout[row][column] == 1) {
-	                	   bricks[brickTotal] = new Brick(
-		                		   row, 
-		                		   column, 
-		                		   brickWidth, 
-		                		   brickHeight);
-	                	   brickTotal ++;
-	                   }
-	              }
-	         }
 	     }
 	
 	     public void run() {
@@ -126,9 +116,9 @@ public class MainActivity extends Activity {
 	    	 
 	    	 // Check for ball colliding with a brick
 	    	 for(int i = 0; i < brickTotal; i++){
-	    		 if (bricks[i].getVisibility() == 1){
-	    			 if(RectF.intersects(bricks[i].getRect(), ball.getRect())) {
-	    				 bricks[i].setInvisible();
+	    		 if (boxArray[i].getVisibility() == 1){
+	    			 if(RectF.intersects(boxArray[i].getRect(), ball.getRect())) {
+	    				 boxArray[i].setInvisible();
 	    				 ball.reverseYVelocity();
 	    				 __game_Session.scoreUp();
 	    				 brickDone++;
@@ -150,6 +140,8 @@ public class MainActivity extends Activity {
 	    		 ball.reverseYVelocity();
 	    	     ball.clearObstacleY(screenY - 2);
 	    	     __game_Session.lifedown();
+	    	     if(vibrator != null)
+	    	    	 vibrator.vibrate(100);
 	    	     soundPool.play(loseLifeID, 1, 1, 0, 0, 1);
 	    	     if(__game_Session.checkLife()){
 	    	    	 __game_Session.reset();
@@ -199,10 +191,10 @@ public class MainActivity extends Activity {
 	             canvas.drawRect(paddle.getRect(), paint);	
 	             canvas.drawRect(ball.getRect(), paint);
 	             
-	             paint.setColor(Color.argb(255,  249, 129, 0)); // for bricks
+	             paint.setColor(Color.argb(255,  249, 129, 0)); // for boxArray
 	             for(int i = 0; i < brickTotal; i++){
-	                  if(bricks[i].getVisibility() == 1) {
-	                       canvas.drawRect(bricks[i].getRect(), paint);
+	                  if(boxArray[i].getVisibility() == 1) {
+	                       canvas.drawRect(boxArray[i].getRect(), paint);
 	                  }
 	             }
 
@@ -287,9 +279,22 @@ public class MainActivity extends Activity {
 
 		public void onAccuracyChanged(Sensor arg0, int arg1) {
 		}
+
+		 
+		@Override
+		public void onAttachedToWindow (){
+			super.onAttachedToWindow();
+		    this.setKeepScreenOn(true);
+		}
+
+		@Override
+		public void onDetachedFromWindow(){
+		    super.onDetachedFromWindow();
+		    this.setKeepScreenOn(false);
+		}
 	 }
 
-	 @Override
+     @Override
 	 protected void onResume() {
 	     super.onResume();
 	     mainView.resume();

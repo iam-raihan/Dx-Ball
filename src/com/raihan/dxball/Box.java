@@ -2,12 +2,12 @@ package com.raihan.dxball;
 
 import android.graphics.RectF;
 
-public class Brick {
+public class Box {
     private RectF rect;
     private int padding;
     private int isVisible;
  
-    public Brick(int row, int column, int width, int height){
+    public Box(int row, int column, int width, int height){
         isVisible = 1;
         padding = 1;
         rect = new RectF(

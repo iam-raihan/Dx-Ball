@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 public class Settings {
 	private int maxLife = 3;
+	
 	private int[][][] layout = {
 			{
 				{ 0, 0, 1, 1, 1, 1, 0, 0},
@@ -28,18 +29,12 @@ public class Settings {
 			}
 		};
 	
-	private int maxLavel;
-	
-	public Settings(){
-		maxLavel = layout.length;		
-	}
-	
 	public int getMaxLife(){
 		return maxLife;
 	}
 	
 	public int getMaxLavel(){
-		return maxLavel;
+		return layout.length;
 	}
 	
 	public int[][] getLayout(int lavel){

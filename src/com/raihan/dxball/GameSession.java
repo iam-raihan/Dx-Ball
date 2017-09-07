@@ -1,5 +1,8 @@
 package com.raihan.dxball;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 
 public class GameSession {
@@ -43,10 +46,6 @@ public class GameSession {
 		return highScoreObj.getHighScore();
 	}
 
-	public int[][] getCurLayout(){
-		return settings.getLayout(curLavel);
-	}
-	
 	public void scoreUp(){
 		curScore += 10;
 	}
@@ -81,5 +80,25 @@ public class GameSession {
 
 	public int getCurBackColor() {
 		return settings.getBackColor(3 - curLife);
+	}
+
+	public Box[] getBricks(int screenX){
+		int[][] curLayout = settings.getLayout(curLavel);
+		int boxSize = screenX / 8;
+        List<Box> boxList = new ArrayList<Box>();
+        
+        for(int row = 0; row < 8; row ++ ){
+             for(int column = 0; column < 5; column ++ ){
+                  if (curLayout[column][row] == 1) {
+                	  boxList.add(new Box(
+                			  column, 
+	                		  row, 
+	                		  boxSize, 
+	                		  boxSize)
+                	  );
+                  }
+             }
+        }
+		return boxList.toArray(new Box[boxList.size()]);
 	}
 }
