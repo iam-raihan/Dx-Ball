@@ -11,8 +11,8 @@ public class GameSession {
 	private int maxLife;
 	private int curLife;
 	
-	private int maxLavel;
-	private int curLavel;
+	private int maxLevel;
+	private int curLevel;
 		
 	private HighScore highScoreObj;
 	private Settings settings;
@@ -26,8 +26,8 @@ public class GameSession {
 		maxLife = settings.getMaxLife();
 		curLife = maxLife;
 		
-		maxLavel = settings.getMaxLavel();
-		curLavel = 1;
+		maxLevel = settings.getMaxLevel();
+		curLevel = 1;
 	}
 	
 	public int getCurScore(){
@@ -38,8 +38,8 @@ public class GameSession {
 		return curLife;
 	}
 
-	public int getCurLavel(){
-		return curLavel;
+	public int getCurLevel(){
+		return curLevel;
 	}
 	
 	public int getHighScore(){
@@ -54,8 +54,8 @@ public class GameSession {
 		curScore -= 5;
 	}
 	
-	public void lavelUp(){
-		curLavel++;
+	public void levelUp(){
+		curLevel++;
 		curLife = maxLife;
 	}
 	
@@ -67,15 +67,15 @@ public class GameSession {
 		return curLife <= 0;
 	}
 	
-	public boolean checkLavel(){
-		return curLavel > maxLavel;
+	public boolean checkLevel(){
+		return curLevel > maxLevel;
 	}
 	
 	public void reset(){
 		highScoreObj.setHighScore(curScore);
 		curScore = 0;
 		curLife = maxLife;
-		curLavel = 1;
+		curLevel = 1;
 	}
 
 	public int getCurBackColor() {
@@ -83,7 +83,7 @@ public class GameSession {
 	}
 
 	public Box[] getBricks(int screenX){
-		int[][] curLayout = settings.getLayout(curLavel);
+		int[][] curLayout = settings.getLayout(curLevel);
 		int boxSize = screenX / 8;
         List<Box> boxList = new ArrayList<Box>();
         

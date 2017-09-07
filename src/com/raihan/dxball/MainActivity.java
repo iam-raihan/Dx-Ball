@@ -173,8 +173,8 @@ public class MainActivity extends Activity {
 	    	 
 	    	 // Pause if cleared screen
 	    	 if(brickDone == brickTotal){
-	    		 __game_Session.lavelUp();
-	    		 if (__game_Session.checkLavel()){
+	    		 __game_Session.levelUp();
+	    		 if (__game_Session.checkLevel()){
 		        	 __game_Session.reset();
 	    		 }
 	    		 paused = true;
@@ -194,17 +194,16 @@ public class MainActivity extends Activity {
 	             paint.setColor(Color.argb(255,  249, 129, 0)); // for boxArray
 	             for(int i = 0; i < brickTotal; i++){
 	                  if(boxArray[i].getVisibility() == 1) {
-	                       canvas.drawRect(boxArray[i].getRect(), paint);
+	                       canvas.drawRoundRect(boxArray[i].getRect(), 50, 50, paint);
 	                  }
 	             }
 
 	             paint.setColor(Color.argb(255, 0, 0, 0));
-	             paint.setTextSize(30);
-	             canvas.drawText(
-	            		 "Score: " + __game_Session.getCurScore() + 
-	            		 "  Lives: " + __game_Session.getCurLife() +
-	            		 "  Lavel: " + __game_Session.getCurLavel() +
-	            		 "  High Score: " + __game_Session.getHighScore() , 10, 50, paint);
+	             paint.setTextSize(40);
+	             canvas.drawText("Score: " + __game_Session.getCurScore(), 10, screenY/2, paint);
+	             canvas.drawText("Life: " + __game_Session.getCurLife(), 10, screenY/2 + 50, paint);
+	             canvas.drawText("Level: " + __game_Session.getCurLevel(), 10, screenY/2 + 100, paint);
+	             canvas.drawText("High Score: " + __game_Session.getHighScore() , 10, screenY/2 + 150, paint);
 	             
 	             ourHolder.unlockCanvasAndPost(canvas);
 	         }	

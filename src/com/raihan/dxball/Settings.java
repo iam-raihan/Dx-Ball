@@ -33,7 +33,7 @@ public class Settings {
 		return maxLife;
 	}
 	
-	public int getMaxLavel(){
+	public int getMaxLevel(){
 		return layout.length;
 	}
 	
