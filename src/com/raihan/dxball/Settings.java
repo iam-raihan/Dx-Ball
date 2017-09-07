@@ -3,8 +3,7 @@ package com.raihan.dxball;
 import android.graphics.Color;
 
 public class Settings {
-	private int lavelCount;
-	
+	private int maxLife = 3;
 	private int[][][] layout = {
 			{
 				{ 0, 0, 1, 1, 1, 1, 0, 0},
@@ -29,12 +28,22 @@ public class Settings {
 			}
 		};
 	
+	private int maxLavel;
+	
 	public Settings(){
-		lavelCount = layout.length;;
+		maxLavel = layout.length;		
 	}
 	
-	public int[][][] getLayout(){
-		return layout;
+	public int getMaxLife(){
+		return maxLife;
+	}
+	
+	public int getMaxLavel(){
+		return maxLavel;
+	}
+	
+	public int[][] getLayout(int lavel){
+		return layout[lavel - 1];
 	}
 	
 	public int getBackColor(int life){
@@ -46,7 +55,4 @@ public class Settings {
 		}
 		return Color.argb(255,  231, 76, 60); //red
 	}
-
-	
-
 }

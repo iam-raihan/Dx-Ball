@@ -12,8 +12,9 @@ public class Ball {
     float ballHeight = 10;
  
     public Ball(){
-        xVelocity = 200;
-        yVelocity = -400;
+        xVelocity = 200 + new Random().nextInt(50);
+        yVelocity = -400 + new Random().nextInt(50);
+        randomXVelocity();
         rect = new RectF();
     }
  
@@ -33,19 +34,17 @@ public class Ball {
     }
  
     public void reverseYVelocity(){
-        yVelocity = -yVelocity;
+        yVelocity = -yVelocity + new Random().nextInt(50);
     }
  
     public void reverseXVelocity(){
-        xVelocity = - xVelocity;
+        xVelocity = -xVelocity + new Random().nextInt(50);
     }
- 
-    public void setRandomXVelocity(){
-        Random generator = new Random();
-        int answer = generator.nextInt(2);
-        if(answer == 0){
-            reverseXVelocity();
-        }
+    
+    private void randomXVelocity(){
+    	if(new Random().nextInt(2) == 1){
+    		reverseXVelocity();
+    	}
     }
  
     public void clearObstacleY(float y){
@@ -63,5 +62,8 @@ public class Ball {
         rect.top = y - 20;
         rect.right = x / 2 + ballWidth;
         rect.bottom = y - 20 - ballHeight;
+        xVelocity = 200 + new Random().nextInt(50);
+        yVelocity = -400 + new Random().nextInt(50);
+        randomXVelocity();
     }
 }

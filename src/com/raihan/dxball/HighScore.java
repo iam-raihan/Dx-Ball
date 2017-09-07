@@ -8,16 +8,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import android.content.Context;
-import android.widget.Toast;
 
 public class HighScore {
 	private int highScore;
 	private ScoreFile scoreFile;
-	private Context context;
 	
 	public HighScore(Context context) {
-		this.context = context;
-		scoreFile = new ScoreFile();
+		scoreFile = new ScoreFile(context);
 		highScore = scoreFile.ReadFile();
 	}
 	
@@ -26,18 +23,18 @@ public class HighScore {
 	}
 
 	public void setHighScore(int score) {
-		if (this.highScore < score) {
-			this.highScore = score;
+		if (this.highScore < score)
 			scoreFile.WriteFile(score);
-		}
 	}
 	
-	public class ScoreFile{
+	private class ScoreFile{
 		private String FILENAME = "HighScore.txt";
-		private String FILE_READ_FAILED = "Failed to read High Score";
-		private String FILE_WRITE_SUCCESS = "New High Score :";
-		private String FILE_WRITE_FAILED = "Failed to write High Score";
+		private Context context;
 		
+		private ScoreFile(Context context) {
+			this.context = context;
+		}
+	
 		private int ReadFile() {
 			FileInputStream fis = null;
 			
@@ -50,16 +47,11 @@ public class HighScore {
 			InputStreamReader inputStreamReader = new InputStreamReader(fis);
 			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 		
-//			StringBuilder sb = new StringBuilder();
 			String line;
 		
 			try {
-//				while ((line = bufferedReader.readLine()) != null) {
-//					sb.append(line);
-//				}
 				line = bufferedReader.readLine();
 			}catch (IOException e) {
-				Toast.makeText(context, FILE_READ_FAILED, Toast.LENGTH_SHORT).show();
 				return 0;
 			}			
 		
@@ -79,7 +71,6 @@ public class HighScore {
 			try {
 				fos = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
 			} catch (FileNotFoundException e) {
-				Toast.makeText(context, FILE_WRITE_FAILED, Toast.LENGTH_SHORT).show();
 				return;
 			}
 			
@@ -87,7 +78,6 @@ public class HighScore {
 				fos.write(String.valueOf(score).getBytes());
 				fos.flush();
 			} catch (IOException e) {
-				Toast.makeText(context, FILE_WRITE_FAILED, Toast.LENGTH_SHORT).show();
 				return;
 			}
 			
@@ -96,7 +86,7 @@ public class HighScore {
 			} catch (IOException e) {
 			}
 			
-			Toast.makeText(context, FILE_WRITE_SUCCESS + score, Toast.LENGTH_SHORT).show();
+			highScore = score;
 		}
 	}
 }

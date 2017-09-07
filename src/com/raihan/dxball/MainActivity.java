@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
         setContentView(mainView);
     }
     
-	 class MainView extends SurfaceView implements Runnable, SensorEventListener {
+	class MainView extends SurfaceView implements Runnable, SensorEventListener {
 	     Thread gameThread = null;
 	     SurfaceHolder ourHolder;
 	
@@ -51,19 +51,16 @@ public class MainActivity extends Activity {
 	     
 	     Paddle paddle;
 	     Ball ball;
-	     Brick[] bricks = new Brick[200];
+	     Brick[] bricks;
 	     int brickTotal, brickDone;
 	     
 	     Sensor sensor;
 	     SensorManager sensorManager;
 	     
 	     SoundPool soundPool;
-	     int beep1ID = -1, beep2ID = -1, beep3ID = -1, loseLifeID = -1, explodeID = -1;
+	     int beep1ID, beep2ID, beep3ID, loseLifeID, explodeID;
 	     
-	     Settings settings;
-	     int score, lives, lavel, highScore;
-	     int[][][] layout;
-	     HighScore highScoreObj;
+	     GameSession __game_Session;
 	
 	     public MainView(Context context) {
 	         super(context);
@@ -77,32 +74,26 @@ public class MainActivity extends Activity {
 	         
 	         paddle = new Paddle(screenX, screenY);
 	         ball = new Ball();
+	         bricks = new Brick[50];
 	         
-	         settings = new Settings();
-	         
-	         score = 0;
-	         lavel = 0;
-	         
-	         highScoreObj = new HighScore(context);
-	         highScore = highScoreObj.getHighScore();
-	         
-	         layout = settings.getLayout();
+	         __game_Session = new GameSession(context);
 	         
 	         loadMusic(context);
 	         
-    		 createBricksAndRestart();
+    		 createBricksLayout();
 	     }
 	     
-	     public void createBricksAndRestart(){
+	     public void createBricksLayout(){
 	         ball.reset(screenX, screenY);
 	         paddle.reset(screenX);
 	         int brickWidth = screenX / 8;
 	         int brickHeight = screenY / 10;
 	         brickTotal = 0;
 	         brickDone = 0;
+	         int[][] curLayout = __game_Session.getCurLayout();
 	         for(int column = 0; column < 8; column ++ ){
 	              for(int row = 0; row < 5; row ++ ){
-	                   if (layout[lavel][row][column] == 1) {
+	                   if (curLayout[row][column] == 1) {
 	                	   bricks[brickTotal] = new Brick(
 		                		   row, 
 		                		   column, 
@@ -112,8 +103,6 @@ public class MainActivity extends Activity {
 	                   }
 	              }
 	         }
-	         
-	         lives = 3;
 	     }
 	
 	     public void run() {
@@ -141,7 +130,7 @@ public class MainActivity extends Activity {
 	    			 if(RectF.intersects(bricks[i].getRect(), ball.getRect())) {
 	    				 bricks[i].setInvisible();
 	    				 ball.reverseYVelocity();
-	    				 score += 10;
+	    				 __game_Session.scoreUp();
 	    				 brickDone++;
 	    				 soundPool.play(explodeID, 1, 1, 0, 0, 1);
 	    			 }
@@ -150,27 +139,22 @@ public class MainActivity extends Activity {
 	    	 
 	    	 // Check for ball colliding with paddle
 	    	 if(RectF.intersects(paddle.getRect(), ball.getRect())) {
-	    		 ball.setRandomXVelocity();
 	    	     ball.reverseYVelocity();
 	    	     ball.clearObstacleY(paddle.getRect().top - 2);
 	    	     soundPool.play(beep1ID, 1, 1, 0, 0, 1);
-	    	     score -= 5;
+	    	     __game_Session.scoreDown();
 	    	 }
 	    	 
 	    	 // Check for ball colliding with bottom of screen
 	    	 if(ball.getRect().bottom > screenY){
 	    		 ball.reverseYVelocity();
 	    	     ball.clearObstacleY(screenY - 2);
-	    	     lives --;
+	    	     __game_Session.lifedown();
 	    	     soundPool.play(loseLifeID, 1, 1, 0, 0, 1);
-	    	     if(lives == 0){
-	    	    	 lavel = 0;
+	    	     if(__game_Session.checkLife()){
+	    	    	 __game_Session.reset();
 	    	    	 paused = true;
-	    	    	 if (score > highScore) {
-			    		 highScoreObj.setHighScore(score);
-			    		 highScore = highScoreObj.getHighScore();
-		    		 }
-	    	    	 createBricksAndRestart();
+	    	    	 createBricksLayout();
 	    	     }
 		 	 }
 	    	 
@@ -197,18 +181,19 @@ public class MainActivity extends Activity {
 	    	 
 	    	 // Pause if cleared screen
 	    	 if(brickDone == brickTotal){
-	    		 lavel++; 
-	    		 if (lavel == 3)
-		        	 lavel = 0;
+	    		 __game_Session.lavelUp();
+	    		 if (__game_Session.checkLavel()){
+		        	 __game_Session.reset();
+	    		 }
 	    		 paused = true;
-	    		 createBricksAndRestart();
+	    		 createBricksLayout();
 	    	 }
 	     }
 	
 	     public void draw() {
 	         if (ourHolder.getSurface().isValid()) {
 	             canvas = ourHolder.lockCanvas();
-	             canvas.drawColor(settings.getBackColor(3 - lives));
+	             canvas.drawColor(__game_Session.getCurBackColor());
 	             
 	             paint.setColor(Color.argb(255,  255, 255, 255)); // for ball and paddle
 	             canvas.drawRect(paddle.getRect(), paint);	
@@ -224,24 +209,10 @@ public class MainActivity extends Activity {
 	             paint.setColor(Color.argb(255, 0, 0, 0));
 	             paint.setTextSize(30);
 	             canvas.drawText(
-	            		 "Score: " + score + 
-	            		 "  Lives: " + lives +
-	            		 "  Lavel: " + (lavel + 1) +
-	            		 "  High Score: " + highScore , 10, 50, paint);
-	              
-	             if(brickDone == brickTotal && lavel == 2){
-	                  paint.setTextSize(90);
-	                  canvas.drawText("YOU HAVE WON!", 10, screenY/2, paint);
-	                  score = 0;
-	                  lavel = 0;
-	             }
-	              
-	             if(lives <= 0){
-	                  paint.setTextSize(90);
-	                  canvas.drawText("YOU HAVE LOST!", 10, screenY/2, paint);
-	                  score = 0;
-	                  lavel = 0;
-	             }
+	            		 "Score: " + __game_Session.getCurScore() + 
+	            		 "  Lives: " + __game_Session.getCurLife() +
+	            		 "  Lavel: " + __game_Session.getCurLavel() +
+	            		 "  High Score: " + __game_Session.getHighScore() , 10, 50, paint);
 	             
 	             ourHolder.unlockCanvasAndPost(canvas);
 	         }	
