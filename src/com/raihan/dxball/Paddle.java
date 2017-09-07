@@ -3,7 +3,9 @@ package com.raihan.dxball;
 import android.graphics.RectF;
 
 public class Paddle {
-    private RectF rect;
+    private RectF rectL;
+    private RectF rectR;
+    
     private float length;
     private float height;
     private float x;
@@ -17,16 +19,21 @@ public class Paddle {
     private int paddleMoving = STOPPED;
  
     public Paddle(int screenX, int screenY){
-        length = 230;
+        length = 70;
         height = 20;
-        x = screenX / 2 - length / 2;
+        x = screenX / 2;
         y = screenY - 20;
-        rect = new RectF(x, y, x + length, y + height);
+        rectL = new RectF(x - length, y, x, y + height);
+        rectR = new RectF(x, y, x + length, y + height);
         paddleSpeed = 450;
     }
     
-    public RectF getRect(){
-        return rect;
+    public RectF getRectL(){
+        return rectL;
+    }
+    
+    public RectF getRectR(){
+        return rectR;
     }
     
     public void setMovementState(int state){
@@ -34,19 +41,24 @@ public class Paddle {
     }
  
     public void update(long fps, int screenX){
-        if(paddleMoving == LEFT && rect.left > 0){
+        if(paddleMoving == LEFT && rectL.left > 0){
             x = x - paddleSpeed / fps;
         }
-        if(paddleMoving == RIGHT && rect.right < screenX){
+        if(paddleMoving == RIGHT && rectR.right < screenX){
             x = x + paddleSpeed / fps;
         }
-        rect.left = x;
-        rect.right = x + length;
+        setPaddlePosX();
     }
     
     public void reset(int screenX){
-    	x = screenX / 2 - length / 2;
-        rect.left = x;
-        rect.right = x + length;
+    	x = screenX / 2;
+    	setPaddlePosX();
+    }
+    
+    private void setPaddlePosX(){
+    	rectL.left = x - length;
+        rectL.right = x;
+        rectR.left = x;
+        rectR.right = x + length;
     }
 }

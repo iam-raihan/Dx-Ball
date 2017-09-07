@@ -128,9 +128,17 @@ public class MainActivity extends Activity {
 	    	 }
 	    	 
 	    	 // Check for ball colliding with paddle
-	    	 if(RectF.intersects(paddle.getRect(), ball.getRect())) {
+	    	 if(RectF.intersects(paddle.getRectL(), ball.getRect())) {
 	    	     ball.reverseYVelocity();
-	    	     ball.clearObstacleY(paddle.getRect().top - 2);
+	    	     ball.negXVelocity();
+	    	     ball.clearObstacleY(paddle.getRectL().top - 2);
+	    	     soundPool.play(beep1ID, 1, 1, 0, 0, 1);
+	    	     __game_Session.scoreDown();
+	    	 }
+	    	 else if(RectF.intersects(paddle.getRectR(), ball.getRect())) {
+	    	     ball.reverseYVelocity();
+	    	     ball.posXVelocity();
+	    	     ball.clearObstacleY(paddle.getRectR().top - 2);
 	    	     soundPool.play(beep1ID, 1, 1, 0, 0, 1);
 	    	     __game_Session.scoreDown();
 	    	 }
@@ -188,7 +196,8 @@ public class MainActivity extends Activity {
 	             canvas.drawColor(__game_Session.getCurBackColor());
 	             
 	             paint.setColor(Color.argb(255,  255, 255, 255)); // for ball and paddle
-	             canvas.drawRect(paddle.getRect(), paint);	
+	             canvas.drawRect(paddle.getRectL(), paint);	
+	             canvas.drawRect(paddle.getRectR(), paint);	
 	             canvas.drawRect(ball.getRect(), paint);
 	             
 	             paint.setColor(Color.argb(255,  249, 129, 0)); // for boxArray
