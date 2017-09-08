@@ -149,7 +149,7 @@ public class MainActivity extends Activity {
 	    	     ball.clearObstacleY(screenY - 2);
 	    	     gameSession.lifedown();
 	    	     if(vibrator != null)
-	    	    	 vibrator.vibrate(100);
+	    	    	 vibrator.vibrate(50);
 	    	     soundPool.play(loseLifeID, 1, 1, 0, 0, 1);
 	    	     if(gameSession.checkLife()){
 	    	    	 gameSession.reset(false);
@@ -195,12 +195,12 @@ public class MainActivity extends Activity {
 	             canvas = ourHolder.lockCanvas();
 	             canvas.drawColor(gameSession.getCurBackColor());
 	             
-	             paint.setColor(Color.argb(255,  255, 255, 255)); // for ball and paddle
+	             paint.setColor(Color.argb(255, 236, 240, 241)); // for paddle 
 	             canvas.drawRect(paddle.getRectL(), paint);	
 	             canvas.drawRect(paddle.getRectR(), paint);	
 	             canvas.drawRect(ball.getRect(), paint);
 	             
-	             paint.setColor(Color.argb(255,  249, 129, 0)); // for boxArray
+	             paint.setColor(Color.argb(255, 230, 126, 34)); // for boxArray
 	             for(int i = 0; i < brickTotal; i++){
 	                  if(boxArray[i].getVisibility() == 1) {
 	                       canvas.drawRoundRect(boxArray[i].getRect(), 50, 50, paint);
@@ -223,7 +223,6 @@ public class MainActivity extends Activity {
 	         try {
 	             gameThread.join();
 	         } catch (InterruptedException e) {
-	             Log.e("Error:", "joining thread");
 	         }
 	         
 	    	 if (sensorManager != null) {

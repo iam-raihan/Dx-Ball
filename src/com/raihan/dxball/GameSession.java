@@ -57,7 +57,7 @@ public class GameSession {
 	public void levelUp(){
 		curLevel++;
 		int bonus = 0;
-		while(curLife > 0){
+		while(curLife > 1){
 			bonus += 50;
 			curLife--;
 		}

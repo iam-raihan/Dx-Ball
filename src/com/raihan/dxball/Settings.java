@@ -15,9 +15,9 @@ public class Settings {
 			},
 			{
 				{ 1, 1, 1, 0, 0, 1, 1, 1},
+				{ 1, 0, 1, 1, 1, 1, 0, 1},
 				{ 1, 1, 1, 0, 0, 1, 1, 1},
-				{ 1, 1, 1, 0, 0, 1, 1, 1},
-				{ 1, 1, 1, 0, 0, 1, 1, 1},
+				{ 1, 0, 1, 1, 1, 1, 0, 1},
 				{ 1, 1, 1, 0, 0, 1, 1, 1}
 			},
 			{ 
@@ -46,7 +46,7 @@ public class Settings {
 			return Color.argb(255,  46, 204, 113); //green
 		}
 		if( life == 1){
-			return Color.argb(255,  26, 128, 182); //blue
+			return Color.argb(255, 107, 185, 240); //blue
 		}
 		return Color.argb(255,  231, 76, 60); //red
 	}
