@@ -12,9 +12,11 @@ import android.content.Context;
 public class HighScore {
 	private int highScore;
 	private ScoreFile scoreFile;
+	private Context context;
 	
 	public HighScore(Context context) {
-		scoreFile = new ScoreFile(context);
+		this.context = context;
+		scoreFile = new ScoreFile();
 		highScore = scoreFile.ReadFile();
 	}
 	
@@ -23,18 +25,15 @@ public class HighScore {
 	}
 
 	public void setHighScore(int score) {
-		if (this.highScore < score)
+		if (this.highScore < score) {
 			scoreFile.WriteFile(score);
+			Util.showMessage("New High Score : " + highScore);
+		}
 	}
 	
 	private class ScoreFile{
-		private String FILENAME = "HighScore.txt";
-		private Context context;
+		private final String FILENAME = "HighScore.txt";
 		
-		private ScoreFile(Context context) {
-			this.context = context;
-		}
-	
 		private int ReadFile() {
 			FileInputStream fis = null;
 			

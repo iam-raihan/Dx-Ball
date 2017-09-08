@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
 	         __game_Session = new GameSession(context);
 	         
 	         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-	         
+	         Util.setContext(context);
 	         loadMusic(context);
 	         
     		 createBricksLayout();
