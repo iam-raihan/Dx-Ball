@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
 	     SoundPool soundPool;
 	     int beep1ID, beep2ID, beep3ID, loseLifeID, explodeID;
 	     
-	     GameSession __game_Session;
+	     GameSession gameSession;
 	
 	     public MainView(Context context) {
 	         super(context);
@@ -77,7 +77,7 @@ public class MainActivity extends Activity {
 	         paddle = new Paddle(screenX, screenY);
 	         ball = new Ball();
 	         
-	         __game_Session = new GameSession(context);
+	         gameSession = new GameSession(context);
 	         
 	         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 	         Util.setContext(context);
@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
 	         ball.reset(screenX, screenY);
 	         paddle.reset(screenX);
 	         
-	         boxArray = __game_Session.getBricks(screenX);
+	         boxArray = gameSession.getBricks(screenX);
 	         brickTotal = boxArray.length;
 	         brickDone = 0;
 	     }
@@ -120,7 +120,7 @@ public class MainActivity extends Activity {
 	    			 if(RectF.intersects(boxArray[i].getRect(), ball.getRect())) {
 	    				 boxArray[i].setInvisible();
 	    				 ball.reverseYVelocity();
-	    				 __game_Session.scoreUp();
+	    				 gameSession.scoreUp();
 	    				 brickDone++;
 	    				 soundPool.play(explodeID, 1, 1, 0, 0, 1);
 	    			 }
@@ -133,26 +133,26 @@ public class MainActivity extends Activity {
 	    	     ball.negXVelocity();
 	    	     ball.clearObstacleY(paddle.getRectL().top - 2);
 	    	     soundPool.play(beep1ID, 1, 1, 0, 0, 1);
-	    	     __game_Session.scoreDown();
+	    	     gameSession.scoreDown();
 	    	 }
 	    	 else if(RectF.intersects(paddle.getRectR(), ball.getRect())) {
 	    	     ball.reverseYVelocity();
 	    	     ball.posXVelocity();
 	    	     ball.clearObstacleY(paddle.getRectR().top - 2);
 	    	     soundPool.play(beep1ID, 1, 1, 0, 0, 1);
-	    	     __game_Session.scoreDown();
+	    	     gameSession.scoreDown();
 	    	 }
 	    	 
 	    	 // Check for ball colliding with bottom of screen
 	    	 if(ball.getRect().bottom > screenY){
 	    		 ball.reverseYVelocity();
 	    	     ball.clearObstacleY(screenY - 2);
-	    	     __game_Session.lifedown();
+	    	     gameSession.lifedown();
 	    	     if(vibrator != null)
 	    	    	 vibrator.vibrate(100);
 	    	     soundPool.play(loseLifeID, 1, 1, 0, 0, 1);
-	    	     if(__game_Session.checkLife()){
-	    	    	 __game_Session.reset();
+	    	     if(gameSession.checkLife()){
+	    	    	 gameSession.reset(false);
 	    	    	 paused = true;
 	    	    	 createBricksLayout();
 	    	     }
@@ -181,9 +181,9 @@ public class MainActivity extends Activity {
 	    	 
 	    	 // Pause if cleared screen
 	    	 if(brickDone == brickTotal){
-	    		 __game_Session.levelUp();
-	    		 if (__game_Session.checkLevel()){
-		        	 __game_Session.reset();
+	    		 gameSession.levelUp();
+	    		 if (gameSession.checkLevel()){
+		        	 gameSession.reset(true);
 	    		 }
 	    		 paused = true;
 	    		 createBricksLayout();
@@ -193,7 +193,7 @@ public class MainActivity extends Activity {
 	     public void draw() {
 	         if (ourHolder.getSurface().isValid()) {
 	             canvas = ourHolder.lockCanvas();
-	             canvas.drawColor(__game_Session.getCurBackColor());
+	             canvas.drawColor(gameSession.getCurBackColor());
 	             
 	             paint.setColor(Color.argb(255,  255, 255, 255)); // for ball and paddle
 	             canvas.drawRect(paddle.getRectL(), paint);	
@@ -209,10 +209,10 @@ public class MainActivity extends Activity {
 
 	             paint.setColor(Color.argb(255, 0, 0, 0));
 	             paint.setTextSize(40);
-	             canvas.drawText("Score: " + __game_Session.getCurScore(), 10, screenY/2, paint);
-	             canvas.drawText("Life: " + __game_Session.getCurLife(), 10, screenY/2 + 50, paint);
-	             canvas.drawText("Level: " + __game_Session.getCurLevel(), 10, screenY/2 + 100, paint);
-	             canvas.drawText("High Score: " + __game_Session.getHighScore() , 10, screenY/2 + 150, paint);
+	             canvas.drawText("Score: " + gameSession.getCurScore(), 10, screenY/2, paint);
+	             canvas.drawText("Life: " + gameSession.getCurLife(), 10, screenY/2 + 50, paint);
+	             canvas.drawText("Level: " + gameSession.getCurLevel(), 10, screenY/2 + 100, paint);
+	             canvas.drawText("High Score: " + gameSession.getHighScore() , 10, screenY/2 + 150, paint);
 	             
 	             ourHolder.unlockCanvasAndPost(canvas);
 	         }	

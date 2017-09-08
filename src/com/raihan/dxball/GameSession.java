@@ -56,6 +56,13 @@ public class GameSession {
 	
 	public void levelUp(){
 		curLevel++;
+		int bonus = 0;
+		while(curLife > 0){
+			bonus += 50;
+			curLife--;
+		}
+		Util.showMessage("Bonus for extra life: " + bonus);
+		curScore += bonus;
 		curLife = maxLife;
 	}
 	
@@ -71,7 +78,13 @@ public class GameSession {
 		return curLevel > maxLevel;
 	}
 	
-	public void reset(){
+	public void reset(boolean isComplete){
+		String msg;
+		if(isComplete)
+			msg = "You Won!! Score:";
+		else
+			msg = "You Lost!! Score:";
+		Util.showMessage(msg + curScore);
 		highScoreObj.setHighScore(curScore);
 		curScore = 0;
 		curLife = maxLife;
