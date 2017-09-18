@@ -2,13 +2,8 @@
 
 A very basic Dx Ball android game for academic course "Embedded Technologies"
 
-# Screenshot
-
-![screenshot_dxball](https://user-images.githubusercontent.com/17286930/30526348-14c3cfb0-9c3b-11e7-8b7a-65dba4b3180e.png)
-
-
 # Custom Layout
-* To change layout for any level, open ```Settings.java``` file and change this 3D array.
+* To change layout for any level, open ```src/com/raihan/dxball/Settings.java``` file and change this 3D array.
 * Each 2D array element representes one level layout for obstacles.
 
 
@@ -44,6 +39,9 @@ protected final int[][][] layout = {
 	};
 ```
 
+# Screenshot
+
+![screenshot_dxball](https://user-images.githubusercontent.com/17286930/30526834-10ea59c4-9c43-11e7-91d7-2e9239001312.png)
 
 # Apk Download [link](<https://raw.githubusercontent.com/iam-raihan/Dx-Ball/master/Dx%20Ball.apk>) :+1:
 
