@@ -5,11 +5,11 @@ import android.graphics.RectF;
 import java.util.Random;
  
 public class Ball {
-    RectF rect;
-    float xVelocity;
-    float yVelocity;
-    float ballWidth = 10;
-    float ballHeight = 10;
+    private RectF rect;
+    private float xVelocity;
+    private float yVelocity;
+    private float ballWidth = 10;
+    private float ballHeight = 10;
  
     public Ball(){
         xVelocity = 200 + getRandomNum();
@@ -78,6 +78,6 @@ public class Ball {
     }
     
     private int getRandomNum(){
-    	return new Random().nextInt(50) - 25;
+    	return new Random().nextInt(30) - 15;
     }
 }

@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
 	     SurfaceHolder ourHolder;
 	
 	     volatile boolean playing; //will never be cached thread-locally
-	     boolean paused = true;
+	     boolean paused;
 	
 	     Canvas canvas;
 	     Paint paint;
@@ -83,10 +83,12 @@ public class MainActivity extends Activity {
 	         Util.setContext(context);
 	         loadMusic(context);
 	         
-    		 createBricksLayout();
+    		 resetGameLayout();
 	     }
 	     
-	     public void createBricksLayout(){
+	     public void resetGameLayout(){
+	    	 paused = true;
+	    	 
 	         ball.reset(screenX, screenY);
 	         paddle.reset(screenX);
 	         
@@ -153,8 +155,7 @@ public class MainActivity extends Activity {
 	    	     soundPool.play(loseLifeID, 1, 1, 0, 0, 1);
 	    	     if(gameSession.checkLife()){
 	    	    	 gameSession.reset(false);
-	    	    	 paused = true;
-	    	    	 createBricksLayout();
+	    	    	 resetGameLayout();
 	    	     }
 		 	 }
 	    	 
@@ -185,8 +186,7 @@ public class MainActivity extends Activity {
 	    		 if (gameSession.checkLevel()){
 		        	 gameSession.reset(true);
 	    		 }
-	    		 paused = true;
-	    		 createBricksLayout();
+	    		 resetGameLayout();
 	    	 }
 	     }
 	
@@ -233,6 +233,7 @@ public class MainActivity extends Activity {
 	     
 	     public void resume() {
 	         playing = true;
+	         paused = true;
 	         gameThread = new Thread(this);
 	         gameThread.start();
 	         

@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 
-public class GameSession {
+public class GameSession extends Settings {
 	private int curScore;
 	
 	private int maxLife;
@@ -14,19 +14,17 @@ public class GameSession {
 	private int maxLevel;
 	private int curLevel;
 		
-	private HighScore highScoreObj;
-	private Settings settings;
+	private HighScore highScoreObj;	
 	
 	public GameSession(Context context){
 		highScoreObj = new HighScore(context);
-		settings = new Settings();
 		
 		curScore = 0;
 		
-		maxLife = settings.getMaxLife();
+		maxLife = getMaxLife();
 		curLife = maxLife;
 		
-		maxLevel = settings.getMaxLevel();
+		maxLevel = getMaxLevel();
 		curLevel = 1;
 	}
 	
@@ -38,8 +36,8 @@ public class GameSession {
 		return curLife;
 	}
 
-	public int getCurLevel(){
-		return curLevel;
+	public String getCurLevel(){
+		return curLevel + "/" + maxLevel;
 	}
 	
 	public int getHighScore(){
@@ -58,7 +56,7 @@ public class GameSession {
 		curLevel++;
 		int bonus = 0;
 		while(curLife > 1){
-			bonus += 50;
+			bonus += bonusForExtraLife;
 			curLife--;
 		}
 		Util.showMessage("Bonus for extra life: " + bonus);
@@ -92,11 +90,11 @@ public class GameSession {
 	}
 
 	public int getCurBackColor() {
-		return settings.getBackColor(3 - curLife);
+		return getBackColor(3 - curLife);
 	}
 
 	public Box[] getBricks(int screenX){
-		int[][] curLayout = settings.getLayout(curLevel);
+		int[][] curLayout = getLayout(curLevel);
 		int boxSize = screenX / 8;
         List<Box> boxList = new ArrayList<Box>();
         
