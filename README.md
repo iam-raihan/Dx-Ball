@@ -4,7 +4,7 @@ A very basic Dx Ball android game for academic course "Embedded Technologies"
 
 # Custom Layout
 * To change layout for any level, open ```src/com/raihan/dxball/Settings.java``` file and change this 3D array.
-* Each 2D array element representes one level layout for obstacles.
+* Each 2D array element represents one level layout for obstacles.
 
 
 ```java
